@@ -56,9 +56,9 @@ class NaiveBayesClassifier {
 	}
 	
 	public function train($words, $set) {
-		$words = explode(" ", $words);
+		$words = $this->cleanKeywords(explode(" ", $words));
 		foreach($words as $w)
-			$this->store->trainTo($w, $set);
+			$this->store->trainTo(html_entity_decode($w), $set);
 	}
 	
 	public function classify($words) {
@@ -104,7 +104,7 @@ class NaiveBayesClassifier {
 					//	$p[$s]['kw-set'][$k] = 1;
 				}
 				else
-					$p[$s]['kw-set'][$k] = 0.0;
+					$p[$s]['kw-set'][$k] = 0.1;
 				if($this->debug) {
 					echo "P({$k}|{$s}): ", $p[$s]['kw-set'][$k], PHP_EOL;
 				}
@@ -115,13 +115,16 @@ class NaiveBayesClassifier {
 			}
 			
 			$P[$s]['top'] = $P[$s]['top'] * $p[$s]['set'];
+			
+			$P[$s]['bottom'] = $P[$s]['bottom'] > 0 ? $P[$s]['bottom'] : 0.1;
+			
 			$P[$s]['conclusion'] = $P[$s]['top'] / $P[$s]['bottom'];
 			if($this->debug) {
 				echo "P({$s}|";
 				$ks = "";
 				foreach($kw as $k)
 					$ks .= $k.",";
-				echo rtrim($ks, ","), "): ", $P[$s]['conclusion'], PHP_EOL;
+				echo rtrim($ks, ","), "): ", number_format($P[$s]['conclusion'], 10, ',', '.'), PHP_EOL;
 			}
 			
 			echo PHP_EOL;
@@ -132,8 +135,11 @@ class NaiveBayesClassifier {
 		if(!empty($kw)) {
 			$ret = array();
 			foreach($kw as $k)
-				if(!$this->isBlacklisted($k))
+				if(!$this->isBlacklisted($k)) {
+					$k = preg_replace("/[^0-9a-z]/i", "", $k);
+					$k = strtolower($k);
 					$ret[] = $k;
+				}
 			return $ret;
 		}
 	}
