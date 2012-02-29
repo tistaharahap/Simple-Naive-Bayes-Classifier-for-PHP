@@ -99,9 +99,7 @@ class NaiveBayesClassifier {
 				// P(kw[n]|set[n])
 				$wcs = $this->store->getWordCountFromSet($k, $s);
 				if($wcs > 0) {
-					$p[$s]['kw-set'][$k] = $this->store->getWordCount($k) / $wcs;
-					//if($p[$s]['kw-set'][$k] > 1)
-					//	$p[$s]['kw-set'][$k] = 1;
+					$p[$s]['kw-set'][$k] = $wcs / $this->store->getWordCount($k);
 				}
 				else
 					$p[$s]['kw-set'][$k] = 0.1;
@@ -124,7 +122,7 @@ class NaiveBayesClassifier {
 				$ks = "";
 				foreach($kw as $k)
 					$ks .= $k.",";
-				echo rtrim($ks, ","), "): ", number_format($P[$s]['conclusion'], 10, ',', '.'), PHP_EOL;
+				echo rtrim($ks, ","), "): ", number_format($P[$s]['conclusion'], 10, '.', ','), PHP_EOL;
 			}
 			
 			echo PHP_EOL;
