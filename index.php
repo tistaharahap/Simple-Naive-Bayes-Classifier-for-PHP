@@ -52,7 +52,7 @@ $nbc = new NaiveBayesClassifier(array(
 	'debug' => TRUE
 ));
 
-/*$nbc->train('Solskjaer Masih Ogah Nglatih di Inggris. Mantan bintang Manchester United, Ole Gunnar Solskjaer menyatakan dirinya belum ingin kembali ke Inggris untuk menangani tim. Saat ini Solskjaer masih nyaman melatih klub asal negaranya Norwegia, Molde walau namanya sempat dikaitkan sebagai salah satu kandidat pelatih Blackburn Rovers yang sedang terpuruk di Liga Premier. Solskjaer sendiri mengakui bahwa dirinya telah mendapatkan beberapa tawaran dari', 'manchester united');
+$nbc->train('Solskjaer Masih Ogah Nglatih di Inggris. Mantan bintang Manchester United, Ole Gunnar Solskjaer menyatakan dirinya belum ingin kembali ke Inggris untuk menangani tim. Saat ini Solskjaer masih nyaman melatih klub asal negaranya Norwegia, Molde walau namanya sempat dikaitkan sebagai salah satu kandidat pelatih Blackburn Rovers yang sedang terpuruk di Liga Premier. Solskjaer sendiri mengakui bahwa dirinya telah mendapatkan beberapa tawaran dari', 'manchester united');
 $nbc->train('Soal Pogba, MU Angkat Tangan. Manchester United disebutkan telah angkat tangan untuk membahas kontrak baru pemain mudanya, Paul Pogba. Seperti yang diberitakan The Sun, pemain asal Prancis itu dalam perjalanan keluar dari Old Trafford diakhir musim nanti setelah kembali menolak tawaran kontrak baru yang diajukan klub. Sir Alex Ferguson sebenarnya sangat berharap pemain berusia 18 tahun itu bertahan karena memiliki', 'manchester united');
 $nbc->train('Istri Wayne Rooney Bangga Jadi Fans Liverpool. Sikap Coleen Rooney itu mendapat kecaman dari fans Manchester United', 'manchester united');
 $nbc->train('Rooney: Fergie Sosok Pemimpin Luar Biasa. Striker Manchester United, Wayne Rooney, memuji sosok pelatih Sir Alex Ferguson sebagai manajer hebat yang memberi inspirasi untuk setiap pemain di Old Trafford.', 'manchester united');
@@ -70,7 +70,7 @@ $nbc->train('Fabregas Tak Akan Bujuk Van Persie ke Barca. Masih menunda kesepaka
 $nbc->train('Silva: Setiap Pemain Bermimpi Berkostum Barca. Bek AC Milan Thiago Silva mengakui bahwa dia mengetahui ketertarikan Barcelona terhadap dirinya. Meski demikian, saat ini pemain internasional Brasil ini mengaku hanya ingin fokus dengan Rossoneri.', 'barcelona');
 $nbc->train('Falcao Sebut Keputusan Wasit Untungkan Barca. Penyerang Ateltico Madrid, Falcao rupanya masih menyimpan rasa kesal terkait dengan kekalahan 2-1 melawan Barcelona akhir minggu lalu. Striker asal Kolombia ini mengkritik keras wasit yang dirasanya menguntungkan Barca.', 'barcelona');
 $nbc->train('Thiago Silva Buka Opsi Gabung ke Barcelona. Dia memang masih ingin setia dengan AC Milan, namun juga menyadari menolak tim sebesar Barcelona adalah hal yang sangat sulit.', 'barcelona');
-$nbc->train('Guardiola Ajukan Syarat Jika Direkrut Inter', 'barcelona');*/
+$nbc->train('Guardiola Ajukan Syarat Jika Direkrut Inter', 'barcelona');
 
 $nbc->classify('liga juara');
 
