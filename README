@@ -5,7 +5,7 @@ This project is somewhat a fork of a Ruby implementation of Naive Bayes Classifi
 
 The project is implemented in PHP in its simplest form. Fork it and play with the codes.
 
-The codes will probably NOT scale with large data sets with a notes below: 
+The codes will probably NOT scale with large data sets with a few notes below: 
 * MySQL reads will be faster when working with fewer data sets.
 * HandlerSocket reads will be faster with larger data sets.
 * HandlerSocket writes is not Tested.
