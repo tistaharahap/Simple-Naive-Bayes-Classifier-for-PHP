@@ -60,10 +60,10 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 			throw new NaiveBayesClassifierException(3105);
 		
 		// MySQL connection	
-		$this->conn = isset($conf['db_persist']) && $conf['db_persist'] === TRUE ?
+        self::$conn = isset($conf['db_persist']) && $conf['db_persist'] === TRUE ?
 			mysql_pconnect("{$conf['db_host']}:{$conf['db_port']}", $conf['db_user'], $conf['db_pass']):
 			mysql_connect("{$conf['db_host']}:{$conf['db_port']}", $conf['db_user'], $conf['db_pass']);
-		if(!$this->conn)
+		if(!self::$conn)
 			throw new NaiveBayesClassifierException(3106);
 		else {
 			if(!mysql_select_db($conf['db_name'])) {
@@ -77,8 +77,8 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 		$this->db_pass = $conf['db_pass'];
 		
 		// HandlerSocket connection
-		$this->hsock_read = $conf['hsock_read'];
-		$this->hsock_write = $conf['hsock_write'];
+        self::$hsock_read = $conf['hsock_read'];
+        self::$hsock_write = $conf['hsock_write'];
 		if($conf['hsock_read'] === TRUE || $conf['hsock_write'] === TRUE) {
 			if(class_exists('HandlerSocket')) {
 				$this->hsock->read = $conf['hsock_read'] === TRUE ? 
@@ -107,9 +107,9 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	public function getAllSets() {
-		if(!$this->hsock_read) {
+		if(!self::$hsock_read) {
 			$sql = "SELECT DISTINCT train_set FROM {$this->trainerTable}";
-			$res = mysql_query($sql, $this->conn);
+			$res = mysql_query($sql, self::$conn);
 			$ret = array();
 			while($row = mysql_fetch_array($res)) {
 				$ret[] = $row['train_set'];
@@ -130,9 +130,9 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	public function getWordCount($word) {
-		if(!$this->hsock_read) {
+		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) as total FROM {$this->trainerTable} WHERE train_words = '{$word}'";
-			$res = mysql_fetch_array(mysql_query($sql, $this->conn));
+			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
 			return $res['total'];
 		}
 		else {
@@ -144,9 +144,9 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	public function getAllWordsCount() {
-		if(!$this->hsock_read) {
+		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) as total FROM {$this->trainerTable}";
-			$res = mysql_fetch_array(mysql_query($sql, $this->conn));
+			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
 			return $res['total'];
 		}
 		else {
@@ -158,9 +158,9 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	public function getSetWordCount($set) {
-		if(!$this->hsock_read) {
+		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) AS total FROM {$this->trainerTable} WHERE train_set = '{$set}'";
-			$res = mysql_fetch_array(mysql_query($sql, $this->conn));
+			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
 			return $res['total'];
 		}
 		else {
@@ -178,9 +178,9 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	public function getWordCountFromSet($word, $set) {
-		if(!$this->hsock_read) {
+		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) AS total FROM {$this->trainerTable} WHERE train_words = '{$word}' AND train_set = '{$set}'";
-			$res = mysql_fetch_array(mysql_query($sql, $this->conn));
+			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
 			if($res['total'] == 0)
 				return FALSE;
 			return $res['total'];
@@ -207,9 +207,9 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	public function getAllSetsWordCount() {
-		if(!$this->hsock_read) {
+		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) AS total FROM {$this->trainerTable}";
-			$res = mysql_fetch_array(mysql_query($sql, $this->conn));
+			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
 			return $res['total'];
 		}
 		else {
@@ -221,9 +221,9 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	public function isBlacklisted($word) {
-		if(!$this->hsock_read) {
+		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) AS total FROM {$this->blacklistTable} WHERE word = '{$word}'";
-			$res = mysql_fetch_array(mysql_query($sql, $this->conn));
+			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
 			return $res['total'] > 0 ? TRUE : FALSE;
 		} else {
 			if($this->_openIndex(1, $this->blacklistTable, 'PRIMARY', array('word'), TRUE) === TRUE) {
@@ -244,7 +244,7 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	private function _exec($sql) {
-		return mysql_query($sql, $this->conn) or die(mysql_error());
+		return mysql_query($sql, self::$conn) or die(mysql_error());
 	}
 	
 }
