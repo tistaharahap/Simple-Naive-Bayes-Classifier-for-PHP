@@ -76,6 +76,8 @@ class NaiveBayesClassifier {
 		
 		$P = array();
 		$p = array();
+		$gawc = $this->store->getAllWordsCount()
+		$gaswc = $this->store->getAllSetsWordCount();
 		foreach($sets as $s) {
 			if($this->debug) {
 				echo "For {$s}: ", PHP_EOL;
@@ -84,14 +86,14 @@ class NaiveBayesClassifier {
 			$P[$s]['top'] = $P[$s]['bottom'] = 1;
 			
 			// P(set1)
-			$p[$s]['set'] = $this->store->getSetWordCount($s) / $this->store->getAllSetsWordCount();
+			$p[$s]['set'] = $this->store->getSetWordCount($s) / $gaswc;
 			if($this->debug) {
 				echo "P({$s}): ", $p[$s]['set'], PHP_EOL;
 			}
-			
 			foreach($kw as $k) {
 				// P(kw[n])
-				$p[$s]['kw'][$k] = $this->store->getWordCount($k) / $this->store->getAllWordsCount();
+				$gwc = $this->store->getWordCount($k);
+				$p[$s]['kw'][$k] = $gwc / $gawc;
 				if($this->debug) {
 					echo "P({$k}): ", $p[$s]['kw'][$k], PHP_EOL;
 				}
@@ -99,7 +101,7 @@ class NaiveBayesClassifier {
 				// P(kw[n]|set[n])
 				$wcs = $this->store->getWordCountFromSet($k, $s);
 				if($wcs > 0) {
-					$p[$s]['kw-set'][$k] = $wcs / $this->store->getWordCount($k);
+					$p[$s]['kw-set'][$k] = $wcs / $gwc;
 				}
 				else
 					$p[$s]['kw-set'][$k] = 0.1;
