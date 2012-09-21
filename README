@@ -10,6 +10,7 @@ The codes will probably NOT scale with large data sets with a few notes below:
 * HandlerSocket reads will be faster with larger data sets.
 * HandlerSocket writes is not Tested.
 * HandlerSocket is using php-handlersocket extension <http://code.google.com/p/php-handlersocket/>
+* MongoDB is using php extension from PECL <http://pecl.php.net/package/mongo>
 * MongoDB handle inserts very fast
 * MongoDB is suited for large datasets
 
