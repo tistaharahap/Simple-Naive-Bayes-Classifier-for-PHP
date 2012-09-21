@@ -76,7 +76,7 @@ class NaiveBayesClassifier {
 		
 		$P = array();
 		$p = array();
-		$gawc = $this->store->getAllWordsCount()
+		$gawc = $this->store->getAllWordsCount();
 		$gaswc = $this->store->getAllSetsWordCount();
 		foreach($sets as $s) {
 			if($this->debug) {
