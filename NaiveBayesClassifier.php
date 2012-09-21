@@ -52,13 +52,18 @@ class NaiveBayesClassifier {
 				require_once 'NaiveBayesClassifierStoreMySQL.php';
 				$this->store = new NaiveBayesClassifierStoreMySQL($conf['store']['db']);
 				break;
+			case 'mongodb':
+				require_once 'NaiveBayesClassifierStoreMongoDB.php';
+				$this->store = new NaiveBayesClassifierStoreMongoDB($conf['store']['db']);
+				break;
 		}
 	}
 	
 	public function train($words, $set) {
 		$words = $this->cleanKeywords(explode(" ", $words));
-		foreach($words as $w)
+		foreach($words as $w) {
 			$this->store->trainTo(html_entity_decode($w), $set);
+		}
 	}
 	
 	public function classify($words) {
@@ -78,6 +83,10 @@ class NaiveBayesClassifier {
 		$p = array();
 		$gawc = $this->store->getAllWordsCount();
 		$gaswc = $this->store->getAllSetsWordCount();
+		$highscore = array(
+			'points'	=> 0,
+			'set'		=> ''
+		);
 		foreach($sets as $s) {
 			if($this->debug) {
 				echo "For {$s}: ", PHP_EOL;
@@ -104,7 +113,7 @@ class NaiveBayesClassifier {
 					$p[$s]['kw-set'][$k] = $wcs / $gwc;
 				}
 				else
-					$p[$s]['kw-set'][$k] = 0.1;
+					$p[$s]['kw-set'][$k] = 0;
 				if($this->debug) {
 					echo "P({$k}|{$s}): ", $p[$s]['kw-set'][$k], PHP_EOL;
 				}
@@ -127,8 +136,14 @@ class NaiveBayesClassifier {
 				echo rtrim($ks, ","), "): ", number_format($P[$s]['conclusion'], 10, '.', ','), PHP_EOL;
 			}
 			
-			echo PHP_EOL;
+			if($P[$s]['conclusion'] > $highscore['points']) {
+				$highscore['keyword'] = $words;
+				$highscore['points'] = $P[$s]['conclusion'];
+				$highscore['set'] = $s;
+			}
 		}
+		
+		return $highscore;
 	}
 	
 	private function cleanKeywords($kw = array()) {
