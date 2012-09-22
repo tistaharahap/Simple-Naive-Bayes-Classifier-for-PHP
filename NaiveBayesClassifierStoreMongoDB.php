@@ -51,7 +51,9 @@ class NaiveBayesClassifierStoreMongoDB extends NaiveBayesClassifierStore {
 			throw new NaiveBayesClassifierException(3103);
 				
 		// MongoDB connection	
-        $this->conn = new Mongo("{$conf['db_host']}:{$conf['db_port']}");
+        $this->conn = empty($conf['db_socket']) ?
+        	new Mongo("{$conf['db_host']}:{$conf['db_port']}") :
+        	new Mongo("{$conf['db_socket']}");
         $this->db = $this->conn->selectDB($conf['db_name']);
 	}
 	

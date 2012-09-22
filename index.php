@@ -37,7 +37,8 @@ $nbc = new NaiveBayesClassifier(array(
 		'db'	=> array(
 			'db_host'	=> '127.0.0.1',
 			'db_port'	=> '27017',
-			'db_name'	=> 'bayes'
+			'db_name'	=> 'bayes',
+			'db_socket'	=> 'mongodb:///tmp/mongodb-27017.sock'
 		)
 	),
 	'debug' => FALSE
