@@ -14,12 +14,28 @@ The codes will probably NOT scale with large data sets with a few notes below:
 * MongoDB handle inserts very fast
 * MongoDB is suited for large datasets
 
+
 How To Use/Test
 ---------------
 
 Run the index.php file on command line, any arguments passed after the index.php file will be treated as keywords.
 
 $ php index.php technology apple mobile
+
+
+Performance
+-----------
+
+I am testing using a late 2011 Macbook Air with 4 GB DDR3 Memory and 128 GB SSD with the following dataset:
+* 672,710 Trained keywords
+* 1,229 Trained sets
+* 16 Blacklisted keywords
+
+Testing results [23 September 2012]:
+* MySQL 5.5.24: 1004.3 seconds to classify pizza
+* HandlerSocket: Untested due to compilation failures, will test when I get this working
+* MongoDB 2.2: 441.4 seconds to classify pizza
+
 
 The MIT License (MIT)
 
