@@ -32,7 +32,7 @@ require_once 'NaiveBayesClassifierException.php';
 class NaiveBayesClassifier {
 	
 	private $store;
-	private $debug = FALSE;
+	private $debug = TRUE;
 	
 	public function __construct($conf = array()) {
 		if(empty($conf))
@@ -66,84 +66,56 @@ class NaiveBayesClassifier {
 		}
 	}
 	
-	public function classify($words) {
-		$kw = $this->cleanKeywords(explode(" ", $words));
-		if($this->debug) {
-			echo "Keywords: ", PHP_EOL;
-			print_r($kw); echo PHP_EOL;
-		}
+	public function classify($words, $count = 10) {
+		$keywords = $this->cleanKeywords(explode(" ", $words));
+		$keywordsCount = count($keywords);
 		
-		$sets = $this->store->getAllSets();
-		if($this->debug) {
-			echo "Sets: ", PHP_EOL;
-			print_r($sets); echo PHP_EOL;
-		}
-		
+		$score = array();
 		$P = array();
-		$p = array();
-		$gawc = $this->store->getAllWordsCount();
-		$gaswc = $this->store->getAllSetsWordCount();
-		$highscore = array(
-			'points'	=> 0,
-			'set'		=> ''
-		);
-		foreach($sets as $s) {
-			if($this->debug) {
-				echo "For {$s}: ", PHP_EOL;
+		
+		// Probability of each keyword towards the whole set P(keyword)
+		$P['kws-sum'] = 0;
+		foreach($keywords as $kw) {
+			$P['kws-sum'] += $this->store->getWordCount($kw);
+		}
+		$P['kws-sum'] = $P['kws-sum'] > 0 ? log($P['kws-sum']) : 0;
+		
+		if($P['kws-sum'] != 0) {
+			$sets = $this->store->getAllSets();
+			$sets = array_unique($sets);
+			
+			$numberOfSets = 0;
+			foreach($sets as $s) {
+				$numberOfSets++;
 			}
 			
-			$P[$s]['top'] = $P[$s]['bottom'] = 1;
+			// Probability of the current set winning P(set)
+			$P['set'] = log(1 / $numberOfSets);
 			
-			// P(set1)
-			$p[$s]['set'] = $this->store->getSetWordCount($s) / $gaswc;
-			if($this->debug) {
-				echo "P({$s}): ", $p[$s]['set'], PHP_EOL;
-			}
-			foreach($kw as $k) {
-				// P(kw[n])
-				$gwc = $this->store->getWordCount($k);
-				$p[$s]['kw'][$k] = $gwc / $gawc;
-				if($this->debug) {
-					echo "P({$k}): ", $p[$s]['kw'][$k], PHP_EOL;
-				}
-
-				// P(kw[n]|set[n])
-				$wcs = $this->store->getWordCountFromSet($k, $s);
-				if($wcs > 0) {
-					$p[$s]['kw-set'][$k] = $wcs / $gwc;
-				}
-				else
-					$p[$s]['kw-set'][$k] = 0;
-				if($this->debug) {
-					echo "P({$k}|{$s}): ", $p[$s]['kw-set'][$k], PHP_EOL;
+			foreach($sets as $set) {
+				// Set Word Count
+				$setWordCount = $this->store->getSetWordCount($set);
+				
+				foreach($keywords as $kw) {
+					// Probability of the current keyword belonging to the current set P(keyword|set)
+					$keywordInSetCount = $this->store->getWordCountFromSet($kw, $set);
+					if($keywordInSetCount > 0) {
+						$add = $keywordInSetCount == 0 ? 0 : log($keywordInSetCount / $setWordCount);
+						$P[$set] += $add;
+					}
 				}
 				
-				// Formula
-				$P[$s]['top'] = $P[$s]['top'] * $p[$s]['kw-set'][$k];
-				$P[$s]['bottom'] = $P[$s]['bottom'] * $p[$s]['kw'][$k];
-			}
-			
-			$P[$s]['top'] = $P[$s]['top'] * $p[$s]['set'];
-			
-			$P[$s]['bottom'] = $P[$s]['bottom'] > 0 ? $P[$s]['bottom'] : 0.1;
-			
-			$P[$s]['conclusion'] = $P[$s]['top'] / $P[$s]['bottom'];
-			if($this->debug) {
-				echo "P({$s}|";
-				$ks = "";
-				foreach($kw as $k)
-					$ks .= $k.",";
-				echo rtrim($ks, ","), "): ", number_format($P[$s]['conclusion'], 10, '.', ','), PHP_EOL;
-			}
-			
-			if($P[$s]['conclusion'] > $highscore['points']) {
-				$highscore['keyword'] = $words;
-				$highscore['points'] = $P[$s]['conclusion'];
-				$highscore['set'] = $s;
+				$P['top'] = $P[$set] + $P['set'];
+				$P['bottom'] = $P['kws-sum'];
+				$P[$set] = log(abs($P['top'] / $P['bottom']));
+				
+				$score[$set] = $P[$set];
 			}
 		}
 		
-		return $highscore;
+		arsort($score);
+		
+		return array_slice($score, 0, $count-1);
 	}
 	
 	private function cleanKeywords($kw = array()) {
@@ -153,7 +125,8 @@ class NaiveBayesClassifier {
 				if(!$this->isBlacklisted($k)) {
 					$k = preg_replace("/[^0-9a-z]/i", "", $k);
 					$k = strtolower($k);
-					$ret[] = $k;
+					if(!empty($k))
+						$ret[] = $k;
 				}
 			return $ret;
 		}
@@ -161,6 +134,11 @@ class NaiveBayesClassifier {
 	
 	private function isBlacklisted($word) {
 		return $this->store->isBlacklisted($word);
+	}
+	
+	private function _debug($msg) {
+		if($this->debug)
+			echo $msg . PHP_EOL;
 	}
 	
 }

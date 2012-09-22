@@ -95,6 +95,8 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	}
 	
 	public function trainTo($words, $set) {
+		$words = mysql_escape_string($words);
+		$set = mysql_escape_string($set);
 		if(!$this->isBlacklisted($words)) {
 			$sql = "
 				INSERT IGNORE INTO 
@@ -160,8 +162,8 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	public function getSetWordCount($set) {
 		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) AS total FROM {$this->trainerTable} WHERE train_set = '{$set}'";
-			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
-			return $res['total'];
+			$res = @mysql_fetch_array(mysql_query($sql, self::$conn));
+			return !empty($res['total']) ? $res['total'] : 0;
 		}
 		else {
 			if($this->_openIndex(1111, $this->trainerTable, 'train_set', array('train_words','train_set'), TRUE) === TRUE) {
@@ -180,9 +182,9 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	public function getWordCountFromSet($word, $set) {
 		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) AS total FROM {$this->trainerTable} WHERE train_words = '{$word}' AND train_set = '{$set}'";
-			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
-			if($res['total'] == 0)
-				return FALSE;
+			$res = @mysql_fetch_array(mysql_query($sql, self::$conn));
+			if(empty($res['total']) || $res['total'] == 0)
+				return (int) 0;
 			return $res['total'];
 		}
 		else {
@@ -223,8 +225,8 @@ class NaiveBayesClassifierStoreMySQL extends NaiveBayesClassifierStore {
 	public function isBlacklisted($word) {
 		if(!self::$hsock_read) {
 			$sql = "SELECT COUNT(*) AS total FROM {$this->blacklistTable} WHERE word = '{$word}'";
-			$res = mysql_fetch_array(mysql_query($sql, self::$conn));
-			return $res['total'] > 0 ? TRUE : FALSE;
+			$res = @mysql_fetch_array(mysql_query($sql, self::$conn));
+			return !empty($res) && $res['total'] > 0 ? TRUE : FALSE;
 		} else {
 			if($this->_openIndex(1, $this->blacklistTable, 'PRIMARY', array('word'), TRUE) === TRUE) {
 				$ret = $this->hsock->read->executeSingle(1, '=', array($word), 1, 0);
