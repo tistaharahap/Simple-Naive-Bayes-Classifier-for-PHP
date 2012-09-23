@@ -78,16 +78,16 @@ class NaiveBayesClassifier {
 		$P = array();
 		
 		// Probability of each keyword towards the whole set P(keyword)
+		$numberOfSets = $this->store->getSetCount();
 		$P['kws-sum'] = 0;
 		foreach($keywords as $kw) {
 			$P['kws-sum'] += $this->store->getWordCount($kw);
 		}
-		$P['kws-sum'] = $P['kws-sum'] > 0 ? log($P['kws-sum']) : 0;
+		$P['kws-sum'] = $P['kws-sum'] > 0 ? log($P['kws-sum']) + log($numberOfSets) : 0;
 		$this->_debug($P['kws-sum']);
 		
 		if($P['kws-sum'] != 0) {
 			$sets = $this->store->getAllSets();
-			$numberOfSets = $this->store->getSetCount();
 			
 			// Probability of the current set winning P(set)
 			$P['set'] = log(1 / $numberOfSets);
@@ -95,7 +95,7 @@ class NaiveBayesClassifier {
 			foreach($sets as $set) {
 				// Set Word Count
 				$setWordCount = $this->store->getSetWordCount($set);
-				
+				$P[$set] = 0;
 				foreach($keywords as $kw) {
 					// Probability of the current keyword belonging to the current set P(keyword|set)
 					$keywordInSetCount = $this->store->getWordCountFromSet($kw, $set);
