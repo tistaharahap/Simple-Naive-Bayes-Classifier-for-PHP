@@ -56,6 +56,10 @@ class NaiveBayesClassifier {
 				require_once 'NaiveBayesClassifierStoreMongoDB.php';
 				$this->store = new NaiveBayesClassifierStoreMongoDB($conf['store']['db']);
 				break;
+			case 'redis':
+				require_once 'NaiveBayesClassifierStoreRedis.php';
+				$this->store = new NaiveBayesClassifierStoreRedis($conf['store']['db']);
+				break;
 		}
 	}
 	
@@ -79,6 +83,7 @@ class NaiveBayesClassifier {
 			$P['kws-sum'] += $this->store->getWordCount($kw);
 		}
 		$P['kws-sum'] = $P['kws-sum'] > 0 ? log($P['kws-sum']) : 0;
+		$this->_debug($P['kws-sum']);
 		
 		if($P['kws-sum'] != 0) {
 			$sets = $this->store->getAllSets();
