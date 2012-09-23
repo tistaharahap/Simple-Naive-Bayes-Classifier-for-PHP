@@ -87,12 +87,7 @@ class NaiveBayesClassifier {
 		
 		if($P['kws-sum'] != 0) {
 			$sets = $this->store->getAllSets();
-			$sets = array_unique($sets);
-			
-			$numberOfSets = 0;
-			foreach($sets as $s) {
-				$numberOfSets++;
-			}
+			$numberOfSets = $this->store->getSetCount();
 			
 			// Probability of the current set winning P(set)
 			$P['set'] = log(1 / $numberOfSets);
@@ -112,8 +107,8 @@ class NaiveBayesClassifier {
 				
 				$P['top'] = $P[$set] + $P['set'];
 				$P['bottom'] = $P['kws-sum'];
-				$P[$set] = log(abs($P['top'] / $P['bottom']));
-				
+				$P[$set] = log(abs($P['top'] / $P['bottom'])) / $keywordsCount;
+
 				$score[$set] = $P[$set];
 			}
 		}

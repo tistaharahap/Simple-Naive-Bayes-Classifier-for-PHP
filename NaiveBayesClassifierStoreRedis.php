@@ -75,6 +75,10 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 		return $this->conn->sMembers($this->sets);
 	}
 	
+	public function getSetCount() {
+		return $this->conn->sSize($this->sets);
+	}
+	
 	public function getWordCount($word) {
 		$vals = $this->conn->lGetRange($this->words, 0, -1);
 		$count = 0;
