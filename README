@@ -13,6 +13,8 @@ The codes will probably NOT scale with large data sets with a few notes below:
 * MongoDB is using php extension from PECL <http://pecl.php.net/package/mongo>
 * MongoDB handle inserts very fast
 * MongoDB is suited for large datasets
+* Redis rocks! Blew all other databases to pieces in benchmarks!
+* Redis using php-redis extension <https://github.com/nicolasff/phpredis>
 
 
 How To Use/Test
@@ -35,6 +37,7 @@ Testing results [23 September 2012]:
 * MySQL 5.5.24: 1004.3 seconds to classify pizza
 * HandlerSocket: Untested due to compilation failures, will test when I get this working
 * MongoDB 2.2: 441.4 seconds to classify pizza
+* Redis 2.4.15: 1.2 seconds to classify pizza
 
 
 The MIT License (MIT)
