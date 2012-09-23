@@ -33,22 +33,22 @@ require_once 'NaiveBayesClassifier.php';
 
 $nbc = new NaiveBayesClassifier(array(
 	'store' => array(
-		'mode'	=> 'mongodb',
+		'mode'	=> 'redis',
 		'db'	=> array(
 			'db_host'	=> '127.0.0.1',
-			'db_port'	=> '27017',
-			'db_name'	=> 'bayes',
-			'db_socket'	=> 'mongodb:///tmp/mongodb-27017.sock'
+			'db_port'	=> '6379'
 		)
 	),
-	'debug' => FALSE
+	'debug' => TRUE
 ));
 
 /* ******************************************************************
  * The codes below retrieves data from MongoDB and train them to NBC.
  * Modify to suit your needs, below is using MongoDB.
  * ******************************************************************
- 
+
+echo "Training started.".PHP_EOL;
+$_s = microtime(TRUE);
 $urb = new Mongo('127.0.0.1:27017');
 $db = $urb->bayes;
 $coll = $db->reviews;
@@ -59,8 +59,9 @@ foreach($cursor as $c) {
 }
 unset($cursor);
 $urb->close();
-
-*/
+$_e = microtime(TRUE);
+$_t = $_e - $_s;
+echo "Training finished. Took {$_t} seconds.".PHP_EOL;*/
 
 $_start = 0;
 if(!empty($argv) && count($argv) > 1) {
@@ -68,6 +69,7 @@ if(!empty($argv) && count($argv) > 1) {
 	for($i=1, $max=count($argv); $i<$max; $i++) {
 		$words .= $argv[$i] . " ";
 	}
+	echo "Classifier started.".PHP_EOL;
 	$_start = microtime(TRUE);
 	$result = $nbc->classify($words);
 
@@ -79,5 +81,5 @@ else {
 }
 
 $_end = microtime(TRUE);
-echo 	"Memory Usage: ", memory_get_usage()/1024, " KB", PHP_EOL,
+echo 	"Memory Usage: ", memory_get_usage(TRUE)/1024, " KB", PHP_EOL,
 	"TIME Spent: ", ($_end - $_start), " seconds", PHP_EOL, PHP_EOL;
