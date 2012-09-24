@@ -33,11 +33,10 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 	
 	private $conn;
 	
-	private $trainer = 'nbc-trains';
-	private $blacklist = 'nbc-blacklists';
-	private $setPrefix = "nbc-set";
-	private $words = "nbc-words";
-	private $sets = "nbc-sets";
+	private $trainer 	= 'nbc-trains';
+	private $blacklist 	= 'nbc-blacklists';
+	private $words 		= "nbc-words";
+	private $sets 		= "nbc-sets";
 	
 	function __construct($conf = array()) {
 		if(empty($conf))
@@ -57,18 +56,27 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 		$this->conn->close();
 	}
 	
+	public function addToBlacklist($word) {
+		return $this->conn->incr("{$this->blacklist}#{$word}");
+	}
+	
+	public function removeFromBlacklist($word) {
+		return $this->conn->set("{$this->blacklist}#{$word}", 0);
+	}
+	
 	public function isBlacklisted($word) {
-		$vals = $this->conn->lGetRange($this->blacklist, 0, -1);
-		if(in_array($word, $vals))
-			return TRUE;
-			
-		return FALSE;
+		$res = $this->conn->get("{$this->blacklist}#{$word}");
+		return !empty($res) && $res > 0 ? TRUE : FALSE;
 	}
 	
 	public function trainTo($word, $set) {
-		$this->conn->lPush($this->words, $word);
-		$this->conn->sAdd($this->sets, $set);
-		$this->conn->lPush("{$this->setPrefix}#{$set}", $word);
+		// Sets
+		$this->conn->sAdd("{$this->sets}", $set);
+		$this->conn->lPush("{$this->sets}#{$set}", $word);
+		
+		// Words
+		$this->conn->incr("{$this->words}#{$word}");
+		$this->conn->incr("{$this->words}#{$word}#{$set}");
 	}
 	
 	public function getAllSets() {
@@ -80,14 +88,7 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 	}
 	
 	public function getWordCount($word) {
-		$vals = $this->conn->lGetRange($this->words, 0, -1);
-		$count = 0;
-		foreach($vals as $v) {
-			if($v == $word)
-				$count++;
-		}
-			
-		return $count;
+		return $this->conn->get("{$this->words}#{$word}");
 	}
 	
 	public function getAllWordsCount() {
@@ -95,22 +96,12 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 	}
 	
 	public function getSetWordCount($set) {
-		return $this->conn->lSize("{$this->setPrefix}#{$set}");
+		return $this->conn->lSize("{$this->sets}#{$set}");
 	}
 	
 	public function getWordCountFromSet($word, $set) {
-		$members = $this->conn->lGetRange("{$this->setPrefix}#{$set}", 0, -1);
-		$count = 0;
-		foreach($members as $m) {
-			if($m == $word)
-				$count++;
-		}
-			
-		return $count;
-	}
-	
-	public function getAllSetsWordCount() {
-		$this->getAllWordsCount();
+		$res = $this->conn->get("{$this->words}#{$word}#{$set}");
+		return $res !== FALSE ? $res : 0;
 	}
 	
 }

@@ -84,7 +84,6 @@ class NaiveBayesClassifier {
 			$P['kws-sum'] += $this->store->getWordCount($kw);
 		}
 		$P['kws-sum'] = $P['kws-sum'] > 0 ? log($P['kws-sum']) + log($numberOfSets) : 0;
-		$this->_debug($P['kws-sum']);
 		
 		if($P['kws-sum'] != 0) {
 			$sets = $this->store->getAllSets();
@@ -122,7 +121,7 @@ class NaiveBayesClassifier {
 		if(!empty($kw)) {
 			$ret = array();
 			foreach($kw as $k)
-				if(!$this->isBlacklisted($k)) {
+				if(strlen($k) > 2 && !$this->isBlacklisted($k)) {
 					$k = preg_replace("/[^0-9a-z]/i", "", $k);
 					$k = strtolower($k);
 					if(!empty($k))
