@@ -1,9 +1,9 @@
 <?php
 /**
- * Abstract implementation of NaiveBayesClassifierStore for MySQL
+ * Abstract implementation of NaiveBayesClassifierStore for Redis
  * 
  * @package	Simple NaiveBayesClassifier for PHP
- * @subpackage	NaiveBayesClassifierStoreMongoDB
+ * @subpackage	NaiveBayesClassifierStoreRedis
  * @author	Batista R. Harahap <batista@bango29.com>
  * @link	http://www.bango29.com
  * @license	MIT License - http://www.opensource.org/licenses/mit-license.php
