@@ -34,7 +34,6 @@ abstract class NaiveBayesClassifierStore {
 	public abstract function getAllWordsCount();
 	public abstract function getSetWordCount($set);
 	public abstract function getWordCountFromSet($word, $set);
-	public abstract function getAllSetsWordCount();
 	
 	public abstract function isBlacklisted($word);
 }
