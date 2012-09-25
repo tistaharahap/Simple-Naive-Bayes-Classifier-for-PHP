@@ -117,6 +117,21 @@ class NaiveBayesClassifier {
 		return array_slice($score, 0, $count-1);
 	}
 	
+	public function blacklist($words = array()) {
+		$clean = array();
+		if(is_string($words)) {
+			$clean = array($words);
+		}
+		else if(is_array($words)) {
+			$clean = $words;
+		}
+		$clean = $this->cleanKeywords($clean);
+		
+		foreach($clean as $word) {
+			$this->store->addToBlacklist($word);
+		}
+	}
+	
 	private function cleanKeywords($kw = array()) {
 		if(!empty($kw)) {
 			$ret = array();
