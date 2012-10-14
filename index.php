@@ -36,29 +36,27 @@ $nbc = new NaiveBayesClassifier(array(
 		'mode'	=> 'redis',
 		'db'	=> array(
 			'db_host'	=> '127.0.0.1',
-			'db_port'	=> '6379'
+			'db_port'	=> '6379',
+			'namespace'	=> 'reviews'	// Added to differentiate multiple trainsets
 		)
 	),
-	'debug' => TRUE
+	'debug' => FALSE
 ));
 
-/* ******************************************************************
- * The codes below retrieves data from MongoDB and train them to NBC.
- * Modify to suit your needs, below is using MongoDB.
- * ******************************************************************
-
-echo "Training started.".PHP_EOL;
+/*echo "Training started.".PHP_EOL;
 $_s = microtime(TRUE);
-$urb = new Mongo('127.0.0.1:27017');
-$db = $urb->bayes;
-$coll = $db->reviews;
-$cursor = $coll->find();
 
-foreach($cursor as $c) {
-	$nbc->train($c['review_text'], $c['review_by']);
+$urb = mysql_connect('127.0.0.1', 'root', '');
+mysql_select_db('bayes');
+
+$sql = "SELECT * FROM reviews";
+$q = mysql_query($sql);
+while($row = mysql_fetch_object($q)) {
+	$nbc->train($row->review_text, $row->review_by);
 }
-unset($cursor);
-$urb->close();
+
+mysql_close($urb);
+
 $_e = microtime(TRUE);
 $_t = $_e - $_s;
 echo "Training finished. Took {$_t} seconds.".PHP_EOL;*/

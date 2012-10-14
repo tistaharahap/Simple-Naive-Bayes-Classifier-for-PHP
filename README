@@ -5,16 +5,15 @@ This project is somewhat a fork of a Ruby implementation of Naive Bayes Classifi
 
 The project is implemented in PHP in its simplest form. Fork it and play with the codes.
 
-The codes will probably NOT scale with large data sets with a few notes below: 
-* MySQL reads will be faster when working with fewer data sets.
-* HandlerSocket reads will be faster with larger data sets.
-* HandlerSocket writes is not Tested.
-* HandlerSocket is using php-handlersocket extension <http://code.google.com/p/php-handlersocket/>
-* MongoDB is using php extension from PECL <http://pecl.php.net/package/mongo>
-* MongoDB handle inserts very fast
-* MongoDB is suited for large datasets
-* Redis rocks! Blew all other databases to pieces in benchmarks!
+Major redesign with the codes to only use Redis as store. Very impressive benchmarks.
 * Redis using php-redis extension <https://github.com/nicolasff/phpredis>
+
+
+Changelist
+----------
+
+[14 October 2012]
+Optimization - Classify method and Redis store are updated to do calculations after all the data is acquired first to speed up results.
 
 
 How To Use/Test
@@ -28,16 +27,22 @@ $ php index.php technology apple mobile
 Performance
 -----------
 
-I am testing using a late 2011 Macbook Air with 4 GB DDR3 Memory and 128 GB SSD with the following dataset:
-* 672,710 Trained keywords
-* 1,229 Trained sets
-* 16 Blacklisted keywords
+Very high performance by implementing the store with Redis. Using hashmaps and namespacing to minimize classifying time.
 
-Testing results [23 September 2012]:
-* MySQL 5.5.24: 1004.3 seconds to classify pizza
-* HandlerSocket: Untested due to compilation failures, will test when I get this working
-* MongoDB 2.2: 441.4 seconds to classify pizza
-* Redis 2.4.15: 1.2 seconds to classify pizza
+Hardware:
+- Macbook Air Late 2011
+- Intel Core i5 1.7 GHz
+- 4 GB DDR3 Memory
+- 128 GB SSD
+
+Datasets:
+- 1,212 Sets
+- 319,384 KeywordSets
+
+Classifier:
+- 1 word: pizza => 0.01428 seconds
+- 2 words: pizza pasta => 0.02171 seconds
+- 3 words: pizza pasta meatball => 0.04062 seconds
 
 
 The MIT License (MIT)

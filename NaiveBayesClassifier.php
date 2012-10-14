@@ -76,39 +76,36 @@ class NaiveBayesClassifier {
 		
 		$score = array();
 		$P = array();
-		
-		// Probability of each keyword towards the whole set P(keyword)
+
 		$numberOfSets = $this->store->getSetCount();
-		$P['kws-sum'] = 0;
-		foreach($keywords as $kw) {
-			$P['kws-sum'] += $this->store->getWordCount($kw);
+		$wordCounts = $this->store->getWordCount($keywords);
+		foreach($wordCounts as $c) {
+			$P['kws-sum'] += $c;
 		}
 		$P['kws-sum'] = $P['kws-sum'] > 0 ? log($P['kws-sum']) + log($numberOfSets) : 0;
-		
-		if($P['kws-sum'] != 0) {
+
+		if($P['kws-sum'] > 0) {
 			$sets = $this->store->getAllSets();
-			
-			// Probability of the current set winning P(set)
+			$setWordCounts = $this->store->getSetWordCount($sets);
+			$wordCountFromSet = $this->store->getWordCountFromSet($keywords, $sets);
+
 			$P['set'] = log(1 / $numberOfSets);
-			
+
 			foreach($sets as $set) {
-				// Set Word Count
-				$setWordCount = $this->store->getSetWordCount($set);
-				$P[$set] = 0;
-				foreach($keywords as $kw) {
-					// Probability of the current keyword belonging to the current set P(keyword|set)
-					$keywordInSetCount = $this->store->getWordCountFromSet($kw, $set);
-					if($keywordInSetCount > 0) {
-						$add = $keywordInSetCount == 0 ? 0 : log($keywordInSetCount / $setWordCount);
+				$P[$set] = $add = 0;
+				foreach($keywords as $word) {
+					$key = "{$word}{$this->store->delimiter}{$set}";
+					if($wordCountFromSet[$key] > 0) {
+						$add += $wordCountFromSet[$key] > 0 ? log($wordCountFromSet[$key] / $setWordCounts[$set]) : 0;
 						$P[$set] += $add;
 					}
 				}
-				
+
 				$P['top'] = $P[$set] + $P['set'];
 				$P['bottom'] = $P['kws-sum'];
 				$P[$set] = log(abs($P['top'] / $P['bottom'])) / $keywordsCount;
-
-				$score[$set] = $P[$set];
+				if($P[$set] > 0)
+					$score[$set] = $P[$set];
 			}
 		}
 		

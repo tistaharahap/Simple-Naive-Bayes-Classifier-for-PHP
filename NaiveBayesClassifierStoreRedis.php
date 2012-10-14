@@ -32,11 +32,13 @@ require_once 'NaiveBayesClassifierStore.php';
 class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 	
 	private $conn;
-	
-	private $trainer 	= 'nbc-trains';
+
+	private $namespace	= 'nbc-ns';
 	private $blacklist 	= 'nbc-blacklists';
 	private $words 		= "nbc-words";
 	private $sets 		= "nbc-sets";
+	public $delimiter	= "_--%%--_";
+	private $wordCount	= "--count--";
 	
 	function __construct($conf = array()) {
 		if(empty($conf))
@@ -45,6 +47,13 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 			throw new NaiveBayesClassifierException(3101);
 		if(empty($conf['db_port']))
 			throw new NaiveBayesClassifierException(3102);
+		if(!empty($conf['namespace']))
+			$this->namespace = $conf['namespace'];
+
+		// Namespacing
+		$this->blacklist	= "{$this->namespace}-{$this->blacklist}";
+		$this->words		= "{$this->namespace}-{$this->words}";
+		$this->sets			= "{$this->namespace}-{$this->sets}";
 				
 		// Redis connection	
         $this->conn = new Redis();
@@ -70,38 +79,44 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 	}
 	
 	public function trainTo($word, $set) {
-		// Sets
-		$this->conn->sAdd("{$this->sets}", $set);
-		$this->conn->lPush("{$this->sets}#{$set}", $word);
-		
 		// Words
-		$this->conn->incr("{$this->words}#{$word}");
-		$this->conn->incr("{$this->words}#{$word}#{$set}");
+		$this->conn->hIncrBy($this->words, $word, 1);
+		$this->conn->hIncrBy($this->words, $this->wordCount, 1);
+
+		// Sets
+		$key = "{$word}{$this->delimiter}{$set}";
+		$this->conn->hIncrBy($this->words, $key, 1);
+		$this->conn->hIncrBy($this->sets, $set, 1);
 	}
 	
 	public function getAllSets() {
-		return $this->conn->sMembers($this->sets);
+		return $this->conn->hKeys($this->sets);
 	}
 	
 	public function getSetCount() {
-		return $this->conn->sSize($this->sets);
+		return $this->conn->hLen($this->sets);
 	}
 	
-	public function getWordCount($word) {
-		return $this->conn->get("{$this->words}#{$word}");
+	public function getWordCount($words) {
+		return $this->conn->hMGet($this->words, $words);
 	}
 	
 	public function getAllWordsCount() {
-		return $this->conn->lSize($this->words);
+		return $this->conn->hGet($this->words, $this->wordCount);
 	}
 	
-	public function getSetWordCount($set) {
-		return $this->conn->lSize("{$this->sets}#{$set}");
+	public function getSetWordCount($sets) {
+		return $this->conn->hMGet($this->sets, $sets);
 	}
 	
-	public function getWordCountFromSet($word, $set) {
-		$res = $this->conn->get("{$this->words}#{$word}#{$set}");
-		return $res !== FALSE ? $res : 0;
+	public function getWordCountFromSet($words, $sets) {
+		$keys = array();
+		foreach($words as $word) {
+			foreach($sets as $set) {
+				$keys[] = "{$word}{$this->delimiter}{$set}";
+			}
+		}
+		return $this->conn->hMGet($this->words, $keys);
 	}
 	
 }
