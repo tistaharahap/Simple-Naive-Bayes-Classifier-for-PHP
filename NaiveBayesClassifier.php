@@ -69,48 +69,35 @@ class NaiveBayesClassifier {
 			$this->store->trainTo(html_entity_decode($w), $set);
 		}
 	}
-	
+
 	public function classify($words, $count = 10) {
-		$keywords = $this->cleanKeywords(explode(" ", $words));
-		$keywordsCount = count($keywords);
-		
-		$score = array();
 		$P = array();
+		$score = array();
 
-		$numberOfSets = $this->store->getSetCount();
-		$wordCounts = $this->store->getWordCount($keywords);
-		foreach($wordCounts as $c) {
-			$P['kws-sum'] += $c;
-		}
-		$P['kws-sum'] = $P['kws-sum'] > 0 ? log($P['kws-sum']) + log($numberOfSets) : 0;
+		// Break keywords
+		$keywords = $this->cleanKeywords(explode(" ", $words));
 
-		if($P['kws-sum'] > 0) {
-			$sets = $this->store->getAllSets();
-			$setWordCounts = $this->store->getSetWordCount($sets);
-			$wordCountFromSet = $this->store->getWordCountFromSet($keywords, $sets);
+		// All sets
+		$sets = $this->store->getAllSets();
+		$P['sets'] = array();
 
-			$P['set'] = log(1 / $numberOfSets);
+		// Word counts in sets
+		$setWordCounts = $this->store->getSetWordCount($sets);
+		$wordCountFromSet = $this->store->getWordCountFromSet($keywords, $sets);
 
-			foreach($sets as $set) {
-				$P[$set] = $add = 0;
-				foreach($keywords as $word) {
-					$key = "{$word}{$this->store->delimiter}{$set}";
-					if($wordCountFromSet[$key] > 0) {
-						$add += $wordCountFromSet[$key] > 0 ? log($wordCountFromSet[$key] / $setWordCounts[$set]) : 0;
-						$P[$set] += $add;
-					}
-				}
-
-				$P['top'] = $P[$set] + $P['set'];
-				$P['bottom'] = $P['kws-sum'];
-				$P[$set] = log(abs($P['top'] / $P['bottom'])) / $keywordsCount;
-				if($P[$set] > 0)
-					$score[$set] = $P[$set];
+		foreach($sets as $set) {
+			foreach($keywords as $word) {
+				$key = "{$word}{$this->store->delimiter}{$set}";
+				if($wordCountFromSet[$key] > 0)
+					$P['sets'][$set] += $wordCountFromSet[$key] / $setWordCounts[$set];
 			}
+
+			if(!is_infinite($P['sets'][$set]) && $P['sets'][$set] > 0)
+				$score[$set] = $P['sets'][$set];
 		}
-		
+
 		arsort($score);
-		
+
 		return array_slice($score, 0, $count-1);
 	}
 	
