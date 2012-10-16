@@ -107,17 +107,20 @@ class NaiveBayesClassifier {
 			$this->store->addToBlacklist($word);
 		}
 	}
-	
+
 	private function cleanKeywords($kw = array()) {
 		if(!empty($kw)) {
 			$ret = array();
-			foreach($kw as $k)
-				if(strlen($k) > 2 && !$this->isBlacklisted($k)) {
-					$k = preg_replace("/[^0-9a-z]/i", "", $k);
+			foreach($kw as $k) {
+				$k = strtolower($k);
+				$k = preg_replace("/[^a-z]/i", "", $k);
+
+				if(!empty($k) && strlen($k) > 2) {
 					$k = strtolower($k);
 					if(!empty($k))
 						$ret[] = $k;
 				}
+			}
 			return $ret;
 		}
 	}
