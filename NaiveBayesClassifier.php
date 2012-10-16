@@ -48,14 +48,6 @@ class NaiveBayesClassifier {
 			$this->debug = TRUE;
 			
 		switch($conf['store']['mode']) {
-			case 'mysql':
-				require_once 'NaiveBayesClassifierStoreMySQL.php';
-				$this->store = new NaiveBayesClassifierStoreMySQL($conf['store']['db']);
-				break;
-			case 'mongodb':
-				require_once 'NaiveBayesClassifierStoreMongoDB.php';
-				$this->store = new NaiveBayesClassifierStoreMongoDB($conf['store']['db']);
-				break;
 			case 'redis':
 				require_once 'NaiveBayesClassifierStoreRedis.php';
 				$this->store = new NaiveBayesClassifierStoreRedis($conf['store']['db']);
