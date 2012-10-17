@@ -37,6 +37,7 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 	private $blacklist 	= 'nbc-blacklists';
 	private $words 		= "nbc-words";
 	private $sets 		= "nbc-sets";
+	private $cache		= "nbc-cache";
 	public $delimiter	= "_--%%--_";
 	private $wordCount	= "--count--";
 	
@@ -54,6 +55,7 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 		$this->blacklist	= "{$this->namespace}-{$this->blacklist}";
 		$this->words		= "{$this->namespace}-{$this->words}";
 		$this->sets			= "{$this->namespace}-{$this->sets}";
+		$this->cache		= "{$this->namespace}-{$this->cache}";
 				
 		// Redis connection	
         $this->conn = new Redis();
@@ -87,6 +89,30 @@ class NaiveBayesClassifierStoreRedis extends NaiveBayesClassifierStore {
 		$key = "{$word}{$this->delimiter}{$set}";
 		$this->conn->hIncrBy($this->words, $key, 1);
 		$this->conn->hIncrBy($this->sets, $set, 1);
+	}
+
+	public function deTrainFromSet($word, $set) {
+		$key = "{$word}{$this->delimiter}{$set}";
+
+		$check = $this->conn->hExists($this->words, $word) &&
+			$this->conn->hExists($this->words, $this->wordCount) &&
+			$this->conn->hExists($this->words, $key) &&
+			$this->conn->hExists($this->sets, $set);
+
+		if($check) {
+			// Words
+			$this->conn->hIncrBy($this->words, $word, -1);
+			$this->conn->hIncrBy($this->words, $this->wordCount, -1);
+
+			// Sets
+			$this->conn->hIncrBy($this->words, $key, -1);
+			$this->conn->hIncrBy($this->sets, $set, -1);
+
+			return TRUE;
+		}
+		else {
+			return FALSE;
+		}
 	}
 	
 	public function getAllSets() {

@@ -29,6 +29,7 @@
 
 abstract class NaiveBayesClassifierStore {
 	public abstract function trainTo($words, $set);
+	public abstract function deTrainFromSet($words, $set);
 	public abstract function getAllSets();
 	public abstract function getWordCount($word);
 	public abstract function getAllWordsCount();

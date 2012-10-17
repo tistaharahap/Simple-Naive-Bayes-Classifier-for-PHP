@@ -62,7 +62,14 @@ class NaiveBayesClassifier {
 		}
 	}
 
-	public function classify($words, $count = 10) {
+	public function deTrain($words, $set) {
+		$words = $this->cleanKeywords(explode(" ", $words));
+		foreach($words as $w) {
+			$this->store->deTrainFromSet(html_entity_decode($w), $set);
+		}
+	}
+
+	public function classify($words, $count = 10, $offset = 0) {
 		$P = array();
 		$score = array();
 
@@ -90,7 +97,7 @@ class NaiveBayesClassifier {
 
 		arsort($score);
 
-		return array_slice($score, 0, $count-1);
+		return array_slice($score, $offset, $count-1);
 	}
 	
 	public function blacklist($words = array()) {

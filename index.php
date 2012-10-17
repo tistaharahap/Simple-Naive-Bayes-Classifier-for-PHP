@@ -69,7 +69,10 @@ if(!empty($argv) && count($argv) > 1) {
 	}
 	echo "Classifier started.".PHP_EOL;
 	$_start = microtime(TRUE);
-	$result = $nbc->classify($words);
+
+	$offset = 0;
+	$row = 10;
+	$result = $nbc->classify($words, $row, $offset);
 
 	var_dump($result);
 	echo PHP_EOL;
