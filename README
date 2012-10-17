@@ -12,6 +12,9 @@ Major redesign with the codes to only use Redis as store. Very impressive benchm
 Changelist
 ----------
 
+[18 October 2012]
+Added offset/row to classify method and also deTrain method to tackle data updates if applicable.
+
 [14 October 2012]
 Optimization - Classify method and Redis store are updated to do calculations after all the data is acquired first to speed up results.
 
