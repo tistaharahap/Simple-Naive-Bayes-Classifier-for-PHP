@@ -47,6 +47,8 @@ Classifier:
 - 2 words: pizza pasta => 0.02171 seconds
 - 3 words: pizza pasta meatball => 0.04062 seconds
 
+\m/
+
 
 The MIT License (MIT)
 
