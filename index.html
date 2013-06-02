@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Simple-naive-bayes-classifier-for-php : Very basic implementation of Naive Bayes Classifier in PHP" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Simple-naive-bayes-classifier-for-php</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/tistaharahap/Simple-Naive-Bayes-Classifier-for-PHP">View on GitHub</a>
+
+          <h1 id="project_title">Simple-naive-bayes-classifier-for-php</h1>
+          <h2 id="project_tagline">Very basic implementation of Naive Bayes Classifier in PHP</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/tistaharahap/Simple-Naive-Bayes-Classifier-for-PHP/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/tistaharahap/Simple-Naive-Bayes-Classifier-for-PHP/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="simple-naivebayesclassifier-for-php" class="anchor" href="#simple-naivebayesclassifier-for-php"><span class="octicon octicon-link"></span></a>Simple NaiveBayesClassifier for PHP</h1>
+
+<p>This project is somewhat a fork of a Ruby implementation of <a href="https://github.com/alexandru/stuff-classifier">Naive Bayes Classifier</a>. There is a blog post <a href="http://bionicspirit.com/blog/2012/02/09/howto-build-naive-bayes-classifier.html">here</a> finely written and simple in its algorithm which I'm sure just about anyone can implement in any programming language.</p>
+
+<p>The project is implemented in PHP in its simplest form. Fork it and play with the codes.</p>
+
+<p>Major redesign with the codes to only use Redis as store. Very impressive benchmarks.</p>
+
+<ul>
+<li>Redis using php-redis extension - <a href="https://github.com/nicolasff/phpredis">https://github.com/nicolasff/phpredis</a>
+</li>
+</ul><h2>
+<a name="changelist" class="anchor" href="#changelist"><span class="octicon octicon-link"></span></a>Changelist</h2>
+
+<p>[18 October 2012]
+Added offset/row to classify method and also deTrain method to tackle data updates if applicable.</p>
+
+<p>[14 October 2012]
+Optimization - Classify method and Redis store are updated to do calculations after all the data is acquired first to speed up results.</p>
+
+<h2>
+<a name="how-to-usetest" class="anchor" href="#how-to-usetest"><span class="octicon octicon-link"></span></a>How To Use/Test</h2>
+
+<p>Run the index.php file on command line, any arguments passed after the index.php file will be treated as keywords.</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>php index.php technology apple mobile
+</pre></div>
+
+<h2>
+<a name="performance" class="anchor" href="#performance"><span class="octicon octicon-link"></span></a>Performance</h2>
+
+<p>Very high performance by implementing the store with Redis. Using hashmaps and namespacing to minimize classifying time.</p>
+
+<p>Hardware:</p>
+
+<ul>
+<li>Macbook Air Late 2011</li>
+<li>Intel Core i5 1.7 GHz</li>
+<li>4 GB DDR3 Memory</li>
+<li>128 GB SSD</li>
+</ul><p>Datasets:</p>
+
+<ul>
+<li>1,212 Sets</li>
+<li>319,384 KeywordSets</li>
+</ul><p>Classifier:</p>
+
+<ul>
+<li>1 word: pizza =&gt; 0.01428 seconds</li>
+<li>2 words: pizza pasta =&gt; 0.02171 seconds</li>
+<li>3 words: pizza pasta meatball =&gt; 0.04062 seconds</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Simple-naive-bayes-classifier-for-php maintained by <a href="https://github.com/tistaharahap">tistaharahap</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
