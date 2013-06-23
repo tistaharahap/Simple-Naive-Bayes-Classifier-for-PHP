@@ -48,6 +48,13 @@ Classifier:
 - 3 words: pizza pasta meatball => 0.04062 seconds
 
 
+Contributors
+------------
+
+- glenscott - https://github.com/glenscott
+- ZaKull - https://github.com/ZaKull
+
+
 The MIT License (MIT)
 
 Copyright (c) 2012 Batista Harahap
