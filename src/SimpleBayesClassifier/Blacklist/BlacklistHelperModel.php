@@ -1,5 +1,7 @@
 <?php
 
+namespace \Bango29\SimpleBayesClassifier\Blacklist;
+
 require_once 'BlacklistHelper.php';
 
 $stopwords = new BlacklistHelper(array(

@@ -1,5 +1,7 @@
 <?php
 
+namespace \Bango29\SimpleBayesClassifier\Blacklist;
+
 class BlacklistHelper {
 
 	private $conn;
